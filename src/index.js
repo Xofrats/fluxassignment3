@@ -1,17 +1,31 @@
-import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import * as serviceWorker from './serviceWorker';
+import model from './model.js'
+import store from './store.js'
+import view from './view.js'
+import dispatcher from './dispatcher.js'
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+async function init() {
+    try {
+        const data_res = await fetch('http://localhost:8080/data')
+        const data = await data_res.json()
+        const forecasts = await fetch('http://localhost:8080/forecast').then(res => res.json())
+        const theModel = model(data, forecasts)
+        let renderer = dom => ReactDOM.render(dom, document.getElementById('root'))
+        let theDispatcher
+        const theView = view(() => theDispatcher)
+        const theStore = store(theModel, theView, renderer)
+        theDispatcher = dispatcher(theStore)
+        renderer(theView(theModel))
+    } catch (err) {
+        console.log(err)
+    }
+}
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+init()
+
+// If you want your app to work offline and load faster, you can change
+// unregister() to register() below. Note this comes with some pitfalls.
+// Learn more about service workers: https://bit.ly/CRA-PWA
+serviceWorker.unregister();
