@@ -2,18 +2,14 @@ export default (init_model, view, renderer) => {
     let model = init_model
   
     function reducer(action, model) {
+      const {forecasts, data} = action
       switch(action.type) {
-        case 'hire':
-          const { employee, person } = action
-          return model.addEmployee(employee).updatePerson(person)
 
           case 'updateLatest':
-          const {forecasts, data} = action
-          return model.updateModel(data, forecasts)
+          return model.updateLatest(data, forecasts)
 
-          // case 'updateAll':
-          //   const {forecasts, data} = action
-          //   return model.updateModel(data, forecasts)
+          case 'updateAll':
+          return model.updateModel(data, forecasts)
   
         default:
           return model
